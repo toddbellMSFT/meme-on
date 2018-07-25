@@ -11,3 +11,6 @@ Meme On/.vs/Meme On/v15/Server/sqlite3/storage.ide-wal
 Meme On/obj/
 Meme On/Library/
 Meme On/Temp/
+*.sln
+*.csproj
+Meme On/.vs/Meme On/DesignTimeBuild/.dtbcache
