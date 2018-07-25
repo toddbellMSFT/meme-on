@@ -22,7 +22,6 @@ public class ClickMe : MonoBehaviour {
 
     private const float cDefaultZ = -0.5f;
 
-
     public GameObject PlanarPrefab;
     private GameObject planarRenderer;
 
@@ -67,7 +66,7 @@ public class ClickMe : MonoBehaviour {
         {
             // Test if this actually gets called
             currentCount++;
-            //updateClick();
+            updateClick();
 
             Debug.Log("Mouse Down: currentCount " + currentCount.ToString());
             currentCountText.text = currentCount.ToString();
@@ -75,7 +74,7 @@ public class ClickMe : MonoBehaviour {
             isClicked = true;
 
             var logic = ManagerLogic.GetComponent<ManagerLogic>();
-            var memeUrl = logic.GetMeme();
+            string memeUrl = logic.GetCurrentMeme();
 
             using (WWW www = new WWW(memeUrl))
             {

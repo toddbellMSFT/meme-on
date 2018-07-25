@@ -19,6 +19,8 @@ public class ManagerLogic : MonoBehaviour
     private const string testUrl = "https://i.imgur.com/boOaceQ.jpg";
     private const string testMovieUrl = "http://i.imgur.com/7qWDgR0.gifv";
 
+    private string m_memeUrl = "";
+
     // Use this for initialization
     void Start()
     {
@@ -43,6 +45,8 @@ public class ManagerLogic : MonoBehaviour
         playerPlayFabId = result.PlayFabId;
 
         setupMemePrinter();
+
+        GetNewMeme();
     }
 
     private void setupMemePrinter()
@@ -54,10 +58,8 @@ public class ManagerLogic : MonoBehaviour
         sphereButton.transform.position = new Vector3(0, 0, -0.5f);
     }
 
-    public string GetMeme()
+    public void GetNewMeme()
     {
-        string memeUrl = "testUrl";
-
         PlayFabClientAPI.ExecuteCloudScript(new ExecuteCloudScriptRequest()
         {
             FunctionName = "getMeme",
@@ -66,16 +68,20 @@ public class ManagerLogic : MonoBehaviour
         },
         result =>
         {
-            memeUrl = (string)result.FunctionResult;
-            Debug.Log("new meme url: " + memeUrl);
+            m_memeUrl = (string)result.FunctionResult;
+            Debug.Log("new meme url: " + m_memeUrl);
         },
         error =>
         {
             Debug.Log("Got error updating internal user data:");
             Debug.Log(error.GenerateErrorReport());
         });
+   }
 
-        return memeUrl;
+    public string GetCurrentMeme()
+    {
+        GetNewMeme();
+        return m_memeUrl;
     }
 
     public void UpdateUserInternalInventoryValue(double addValue)
@@ -103,22 +109,22 @@ public class ManagerLogic : MonoBehaviour
 
     public void UpdateUserInternalClicks()
     {
-        //if (playerPlayFabId != "")
-        //{
-        //    PlayFabServerAPI.UpdateUserInternalData(new UpdateUserInternalDataRequest()
-        //    {
-        //        PlayFabId = playerPlayFabId,
-        //        Data = new Dictionary<string, string>() {
-        //        {"Clicks", "0"},
-        //    },
-        //    },
-        //    result => Debug.Log("Set internal user data successful"),
-        //    error =>
-        //    {
-        //        Debug.Log("Got error updating internal user data:");
-        //        Debug.Log(error.GenerateErrorReport());
-        //    });
-        //}
+        if (playerPlayFabId != "")
+        {
+            PlayFabServerAPI.UpdateUserInternalData(new UpdateUserInternalDataRequest()
+            {
+                PlayFabId = playerPlayFabId,
+                Data = new Dictionary<string, string>() {
+                {"Clicks", "0"},
+            },
+            },
+            result => Debug.Log("Set internal user data successful"),
+            error =>
+            {
+                Debug.Log("Got error updating internal user data:");
+                Debug.Log(error.GenerateErrorReport());
+            });
+        }
     }
 
     public void GetUserInternalData()
@@ -152,7 +158,6 @@ public class ManagerLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
     }
 
 }
