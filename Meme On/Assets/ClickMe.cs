@@ -22,8 +22,6 @@ public class ClickMe : MonoBehaviour {
 
     private const float cDefaultZ = -0.5f;
 
-    private const string testUrl = "https://i.imgur.com/boOaceQ.jpg";
-    private const string testMovieUrl = "http://i.imgur.com/7qWDgR0.gifv";
 
     public GameObject PlanarPrefab;
     private GameObject planarRenderer;
@@ -39,6 +37,7 @@ public class ClickMe : MonoBehaviour {
         planarRenderer = Instantiate(PlanarPrefab);
         // TODO: attach text to the "front" (0, 0, -0.5) of the button... OR just slide it onto another panel?
         currentCountText = GetComponent<UnityEngine.UI.Text>();
+        ManagerLogic = GameObject.Find("GameManager");
     }
 
     // Update is called once per frame
@@ -53,9 +52,13 @@ public class ClickMe : MonoBehaviour {
             {
                 isClicked = false;
             }
-            var logic = ManagerLogic.GetComponent<ManagerLogic>();
-            logic.UpdateUserInternalClicks();
         }
+    }
+
+    private void updateClick()
+    {
+        var logic = ManagerLogic.GetComponent<ManagerLogic>();
+        logic.UpdateUserInternalClicks();
     }
 
     private IEnumerator OnMouseDown()
@@ -64,14 +67,17 @@ public class ClickMe : MonoBehaviour {
         {
             // Test if this actually gets called
             currentCount++;
+            //updateClick();
 
             Debug.Log("Mouse Down: currentCount " + currentCount.ToString());
             currentCountText.text = currentCount.ToString();
             this.transform.position = new Vector3(0, 0, 0);
             isClicked = true;
 
-            //using (WWW www = new WWW(testMovieUrl))
-            using (WWW www = new WWW(testUrl))
+            var logic = ManagerLogic.GetComponent<ManagerLogic>();
+            var memeUrl = logic.GetMeme();
+
+            using (WWW www = new WWW(memeUrl))
             {
                 yield return www;
                 Renderer renderer = planarRenderer.GetComponent<Renderer>();
