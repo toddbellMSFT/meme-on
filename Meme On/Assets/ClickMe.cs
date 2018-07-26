@@ -12,15 +12,24 @@ public class ClickMe : MonoBehaviour {
     /// </summary>
     private bool isClicked = false;
 
+    /// <summary>
+    /// Meme should move independent of the button
+    /// </summary>
+    private bool hasBeenReset = false;
+
     private const float fastClickSpeed = 0.1f;
     private const float mediumClickSpeed = fastClickSpeed/2;
     private const float slowClickSpeed = fastClickSpeed/4;
     private Vector3 cWaitForClickVelocity = new Vector3(0, 0, slowClickSpeed);
 
     private const float memeScrollSpeed = 0.1f;
-    private Vector3 cMemeScrollVelocity = new Vector3(0, memeScrollSpeed, 0);
+    private const float slowMemeScrollSpeed = memeScrollSpeed/4;
+    private Vector3 cMemeScrollVelocity = new Vector3(0, slowMemeScrollSpeed, 0);
 
-    private const float cDefaultZ = -0.5f;
+    private Vector3 cDefaultPosition = new Vector3(0, 0, -7.5f);
+
+    private float cDefaultZ = -0.5f;
+    private float cMemeY = 1.0f;
 
     public GameObject PlanarPrefab;
     private GameObject planarRenderer;
@@ -31,27 +40,55 @@ public class ClickMe : MonoBehaviour {
     public UnityEngine.UI.Text currentCountText;
     private double currentCount = 0;
 
+    private bool startOnce = false;
+
     // Use this for initialization
-    void Start () {
-        planarRenderer = Instantiate(PlanarPrefab);
-        // TODO: attach text to the "front" (0, 0, -0.5) of the button... OR just slide it onto another panel?
-        currentCountText = GetComponent<UnityEngine.UI.Text>();
-        ManagerLogic = GameObject.Find("GameManager");
+    void Start()
+    {
+        if (!startOnce)
+        {
+            planarRenderer = Instantiate(PlanarPrefab);
+            // TODO: attach text to the "front" (0, 0, -0.5) of the button... OR just slide it onto another panel?
+            currentCountText = GetComponent<UnityEngine.UI.Text>();
+            ManagerLogic = GameObject.Find("GameManager");
+
+            cDefaultZ = cDefaultPosition.z - 0.5f;
+            cMemeY = cDefaultPosition.y + 1.0f;
+            planarRenderer.transform.position = cDefaultPosition;
+            startOnce = true;
+        }
     }
 
     // Update is called once per frame
     void Update() {
-        if (isClicked)
+
+        if (hasBeenReset)
         {
-            this.transform.position -= cWaitForClickVelocity;
-
-            planarRenderer.transform.position += cMemeScrollVelocity;
-
-            if(this.transform.position.z <= cDefaultZ)
+            if(CheckIsMemeDone())
             {
-                isClicked = false;
+                planarRenderer.transform.position += cMemeScrollVelocity;
+                hasBeenReset = CheckIsMemeDone();
             }
         }
+
+        if (isClicked)
+        {
+            if(CheckIsButtonDone())
+            {
+                this.transform.position -= cWaitForClickVelocity;
+                isClicked = CheckIsButtonDone();
+            }
+        }
+    }
+
+    bool CheckIsButtonDone()
+    {
+        return this.transform.position.z > cDefaultZ;
+    }
+
+    bool CheckIsMemeDone()
+    {
+        return planarRenderer.transform.position.y <= cMemeY;
     }
 
     private void updateClick()
@@ -70,8 +107,8 @@ public class ClickMe : MonoBehaviour {
 
             Debug.Log("Mouse Down: currentCount " + currentCount.ToString());
             currentCountText.text = currentCount.ToString();
-            this.transform.position = new Vector3(0, 0, 0);
-            isClicked = true;
+            this.transform.position = cDefaultPosition;
+            isClicked = hasBeenReset = true;
 
             var logic = ManagerLogic.GetComponent<ManagerLogic>();
             string memeUrl = logic.GetCurrentMeme();
@@ -81,7 +118,7 @@ public class ClickMe : MonoBehaviour {
                 yield return www;
                 Renderer renderer = planarRenderer.GetComponent<Renderer>();
                 renderer.material.mainTexture = www.texture;
-                planarRenderer.transform.position = new Vector3(0, 0, 0);
+                planarRenderer.transform.position = cDefaultPosition;
             }
         }
     }
