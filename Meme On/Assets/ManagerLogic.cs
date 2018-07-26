@@ -52,10 +52,11 @@ public class ManagerLogic : MonoBehaviour
     private void setupMemePrinter()
     {
         GameObject body = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        body.transform.position = new Vector3(0, 0, 0);
+        body.transform.position = new Vector3(0, 0, -7.55f);
 
+        //TODO: make this use the same constant as ClickMe.cs
         sphereButton = Instantiate(SphereButtonPrefab);
-        sphereButton.transform.position = new Vector3(0, 0, -0.5f);
+        sphereButton.transform.position = new Vector3(0, 0, -8f);
     }
 
     public void GetNewMeme()
